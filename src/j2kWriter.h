@@ -21,39 +21,44 @@ USA.
 
 */
 
-#ifndef __jp2Reader_h__
-#define __jp2Reader_h__
+#ifndef __j2kWriter_h__
+#define __j2kWriter_h__
 
-#include <DDImage/Reader.h>
+#include <DDImage/Writer.h>
 #include <DDImage/Row.h>
 #include <DDImage/ARRAY.h>
 #include <DDImage/Thread.h>
 #include <FreeImage.h>
+#include <cmath>
 
-class jp2Reader : public DD::Image::Reader
+class j2kWriter : public DD::Image::Writer
 {
   public:
     
     static const Description Desc;
     
-    jp2Reader(DD::Image::Read *iop);
-    virtual ~jp2Reader();
+    j2kWriter(DD::Image::Write *iop);
+    virtual ~j2kWriter();
     
-    virtual void open();
-    virtual void engine(int y, int x, int r, DD::Image::ChannelMask, DD::Image::Row &);
+    virtual void execute();
+    virtual void knobs(DD::Image::Knob_Callback f);
   
   protected:
     
-    FREE_IMAGE_FORMAT mFIF;
-    FIBITMAP *mBitmap;
-    std::string mPath;
-    FREE_IMAGE_TYPE mFIT;
-    unsigned int mWidth;
-    unsigned int mHeight;
-    unsigned int mBPP;
-    unsigned int mNumChannels;
-    unsigned int mChannelBytes;
+    inline int getCompression()
+    {
+      // [0, 1] -> [1, 512]
+      return 1 + int(floor((1.0 - mQuality) * 511.0));
+    }
+    
+    inline void setCompression(int v)
+    {
+      // [1, 512] -> [0, 1]
+      mQuality = 1.0 - double(v - 1) / 511.0;
+    }
+    
+    int mDataType;
+    double mQuality;
 };
-
 
 #endif

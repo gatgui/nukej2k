@@ -28,7 +28,7 @@ j2kReader::j2kReader(DD::Image::Read *iop)
 {
   mPath = iop->filename();
   
-   mFIF = FreeImage_GetFileType(iop->filename());
+  mFIF = FreeImage_GetFileType(iop->filename());
   
   if (mFIF == FIF_UNKNOWN)
   {
@@ -87,7 +87,7 @@ j2kReader::j2kReader(DD::Image::Read *iop)
         
         if (mFIF != FIF_UNKNOWN)
         {
-          set_info((int)mWidth, (int)mHeight, (int)mBPP);
+          set_info((int)mWidth, (int)mHeight, (int)mNumChannels);
         }
       }
       else
@@ -180,13 +180,13 @@ void j2kReader::engine(int y, int x, int r, DD::Image::ChannelMask mask, DD::Ima
         switch (mChannelBytes)
         {
         case 1:
-          from_byte(DD::Image::Chan_Red, dst+x, (const uchar*)src, (const uchar*)alpha, count, mBPP);
+          from_byte(DD::Image::Chan_Red, dst+x, (const uchar*)src, (const uchar*)alpha, count, mNumChannels);
           break;
         case 2:
-          from_short(DD::Image::Chan_Red, dst+x, (const U16*)src, (const U16*)alpha, count, sb, mBPP);
+          from_short(DD::Image::Chan_Red, dst+x, (const U16*)src, (const U16*)alpha, count, sb, mNumChannels);
           break;
         case 4:
-          from_float(DD::Image::Chan_Red, dst+x, (const float*)src, (const float*)alpha, count, mBPP);
+          from_float(DD::Image::Chan_Red, dst+x, (const float*)src, (const float*)alpha, count, mNumChannels);
           break;
         default:
           break;
@@ -203,13 +203,13 @@ void j2kReader::engine(int y, int x, int r, DD::Image::ChannelMask mask, DD::Ima
         switch (mChannelBytes)
         {
         case 1:
-          from_byte(DD::Image::Chan_Green, dst+x, (const uchar*)src, (const uchar*)alpha, count, mBPP);
+          from_byte(DD::Image::Chan_Green, dst+x, (const uchar*)src, (const uchar*)alpha, count, mNumChannels);
           break;
         case 2:
-          from_short(DD::Image::Chan_Green, dst+x, (const U16*)src, (const U16*)alpha, count, sb, mBPP);
+          from_short(DD::Image::Chan_Green, dst+x, (const U16*)src, (const U16*)alpha, count, sb, mNumChannels);
           break;
         case 4:
-          from_float(DD::Image::Chan_Green, dst+x, (const float*)src, (const float*)alpha, count, mBPP);
+          from_float(DD::Image::Chan_Green, dst+x, (const float*)src, (const float*)alpha, count, mNumChannels);
           break;
         default:
           break;
@@ -226,13 +226,13 @@ void j2kReader::engine(int y, int x, int r, DD::Image::ChannelMask mask, DD::Ima
         switch (mChannelBytes)
         {
         case 1:
-          from_byte(DD::Image::Chan_Blue, dst+x, (const uchar*)src, (const uchar*)alpha, count, mBPP);
+          from_byte(DD::Image::Chan_Blue, dst+x, (const uchar*)src, (const uchar*)alpha, count, mNumChannels);
           break;
         case 2:
-          from_short(DD::Image::Chan_Blue, dst+x, (const U16*)src, (const U16*)alpha, count, sb, mBPP);
+          from_short(DD::Image::Chan_Blue, dst+x, (const U16*)src, (const U16*)alpha, count, sb, mNumChannels);
           break;
         case 4:
-          from_float(DD::Image::Chan_Blue, dst+x, (const float*)src, (const float*)alpha, count, mBPP);
+          from_float(DD::Image::Chan_Blue, dst+x, (const float*)src, (const float*)alpha, count, mNumChannels);
           break;
         default:
           break;
@@ -248,13 +248,13 @@ void j2kReader::engine(int y, int x, int r, DD::Image::ChannelMask mask, DD::Ima
         switch (mChannelBytes)
         {
         case 1:
-          from_byte(DD::Image::Chan_Alpha, dst+x, (const uchar*)alpha, 0, count, mBPP);
+          from_byte(DD::Image::Chan_Alpha, dst+x, (const uchar*)alpha, 0, count, mNumChannels);
           break;
         case 2:
-          from_short(DD::Image::Chan_Alpha, dst+x, (const U16*)alpha, 0, count, sb, mBPP);
+          from_short(DD::Image::Chan_Alpha, dst+x, (const U16*)alpha, 0, count, sb, mNumChannels);
           break;
         case 4:
-          from_float(DD::Image::Chan_Alpha, dst+x, (const float*)alpha, 0, count, mBPP);
+          from_float(DD::Image::Chan_Alpha, dst+x, (const float*)alpha, 0, count, mNumChannels);
           break;
         default:
           break;

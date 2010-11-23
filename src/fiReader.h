@@ -174,14 +174,13 @@ public:
         if (dst)
         {
           BYTE *src = bytes;
-          if (mNumChannels >= 3 && mChannelBytes == 1)
-          {
-            // BGR for 24/32 bit images
-            src += 2 * mChannelBytes;
-          }
           switch (mChannelBytes)
           {
           case 1:
+            if (mNumChannels >= 3)
+            {
+              src += FI_RGBA_RED;
+            }
             from_byte(DD::Image::Chan_Red, dst+x, (const uchar*)src, (const uchar*)alpha, count, mNumChannels);
             break;
           case 2:
@@ -228,7 +227,7 @@ public:
           switch (mChannelBytes)
           {
           case 1:
-            // BGR for 24/32 bits images
+            src += FI_RGBA_BLUE * mChannelBytes;
             from_byte(DD::Image::Chan_Blue, dst+x, (const uchar*)src, (const uchar*)alpha, count, mNumChannels);
             break;
           case 2:

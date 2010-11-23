@@ -106,8 +106,7 @@ public:
     
     
     if (mDataType == 0)
-    {
-      // BGR(A)
+    {      
       BYTE *scanline = 0;
       
       bitmap = FreeImage_AllocateT(FIT_BITMAP, w, h, imgDepth*8);
@@ -167,17 +166,17 @@ public:
             
             if (ired != -1)
             {
-              to_byte(DD::Image::Chan_Red-1,   scanline+2, row[ch[ired]],   alpha, w, imgDepth);
+              to_byte(DD::Image::Chan_Red-1,   scanline+FI_RGBA_RED, row[ch[ired]],   alpha, w, imgDepth);
             }
             if (igreen != -1)
             {
-              to_byte(DD::Image::Chan_Green-1, scanline+1, row[ch[igreen]], alpha, w, imgDepth);
+              to_byte(DD::Image::Chan_Green-1, scanline+FI_RGBA_GREEN, row[ch[igreen]], alpha, w, imgDepth);
             }
             if (iblue != -1)
             {
-              to_byte(DD::Image::Chan_Blue-1,  scanline,   row[ch[iblue]],  alpha, w, imgDepth);
+              to_byte(DD::Image::Chan_Blue-1,  scanline+FI_RGBA_BLUE,   row[ch[iblue]],  alpha, w, imgDepth);
             }
-            to_byte(DD::Image::Chan_Alpha-1, scanline+3, row[ch[ialpha]], 0, w, imgDepth);
+            to_byte(DD::Image::Chan_Alpha-1, scanline+FI_RGBA_ALPHA, row[ch[ialpha]], 0, w, imgDepth);
           }
         }
         else
@@ -201,15 +200,15 @@ public:
             
             if (ired != -1)
             {
-              to_byte(DD::Image::Chan_Red-1,   scanline+2, row[ch[ired]],   0, w, imgDepth);
-            }
-            if (iblue != -1)
-            {
-              to_byte(DD::Image::Chan_Green-1, scanline+1, row[ch[igreen]], 0, w, imgDepth);
+              to_byte(DD::Image::Chan_Red-1,   scanline+FI_RGBA_RED, row[ch[ired]],   0, w, imgDepth);
             }
             if (igreen != -1)
             {
-              to_byte(DD::Image::Chan_Blue-1,  scanline,   row[ch[iblue]],  0, w, imgDepth);
+              to_byte(DD::Image::Chan_Green-1, scanline+FI_RGBA_GREEN, row[ch[igreen]], 0, w, imgDepth);
+            }
+            if (iblue != -1)
+            {
+              to_byte(DD::Image::Chan_Blue-1,  scanline+FI_RGBA_BLUE,   row[ch[iblue]],  0, w, imgDepth);
             }
           }
         }
@@ -325,6 +324,10 @@ public:
         }
       }
     }
+    
+    // Add meta information
+    // nuke.colorspace
+    // nuke.script
     
     if (!FreeImage_Save(fif, bitmap, filename(), getFIOptions()))
     {

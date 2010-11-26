@@ -7,6 +7,7 @@
 #include <DDImage/Thread.h>
 #include <FreeImage.h>
 #include <string>
+#include "fiMeta.h"
 
 #if FREEIMAGE_MAJOR_VERSION >= 3 && FREEIMAGE_MINOR_VERSION >= 14
 # define FI_HEADER_ONLY_API
@@ -137,6 +138,23 @@ public:
       {
         mBitmap = FreeImage_Load(mFIF, mPath.c_str());
       }
+      getMetadata(mBitmap);
+    }
+  }
+  
+  virtual void getMetadata(FIBITMAP *img)
+  {
+    std::string colorspace = "";
+    bool pm = false;
+    
+    if (getMetadata(img, META_COLORSPACE, colorspace))
+    {
+      setColorSpace(colorspace);
+    }
+    
+    if (getMetadata(img, META_PREMULT, pm))
+    {
+      iop->premult(pm);
     }
   }
   
@@ -266,6 +284,73 @@ public:
         }
       }
     }
+  }
+  
+protected:
+  
+  const void* getMetadata(FIBITMAP *img,
+                    FREE_IMAGE_MDMODEL model, FREE_IMAGE_MDTYPE dtype,
+                    const std::string &key)
+  {
+    FITAG *tag = 0;
+    if (FreeImage_GetMetadata(model, img, key.c_str(), &tag))
+    {
+      if (FreeImage_GetTagType(tag) == dtype)
+      {
+        return FreeImage_GetTagValue(tag);
+      }
+    }
+    return 0;
+  }
+  
+  bool getMetadata(FIBITMAP *img, const std::string &key, bool &val)
+  {
+    const void *data = getMetadata(img, FIMD_IPTC, FIDT_BYTE, key);
+    if (data)
+    {
+      val = (*((unsigned char*)data) != 0);
+      return true;
+    }
+    return false;
+  }
+  
+  bool getMetadata(FIBITMAP *img, const std::string &key, std::string &val)
+  {
+    const void *data = getMetadata(img, FIMD_IPTC, FIDT_ASCII, key);
+    if (data)
+    {
+      val = (const char*)data;
+      return true;
+    }
+    return false;
+  }
+  
+  void setColorSpace(const std::string &colorspace)
+  {
+    // no better way?
+    int csi = 0;
+    
+    DD::Image::LUT *csl = DD::Image::LUT::builtin(colorspace.c_str());
+    
+    if (csl != 0)
+    {
+      const char **n = &(DD::Image::LUT::builtin_names[0]);
+      while (*n != 0)
+      {
+        if (csl == DD::Image::LUT::builtin(*n))
+        {
+          break;
+        }
+        ++csi;
+        ++n;
+      }
+      if (*n == 0)
+      {
+        csi = 0;
+      }
+    }
+    
+    iop->colorspace(csi);
   }
   
 protected:

@@ -6,8 +6,10 @@
 #include <DDImage/ARRAY.h>
 #include <DDImage/Thread.h>
 #include <DDImage/Knobs.h>
+#include <DDImage/LUT.h>
 #include <FreeImage.h>
 #include <string>
+#include "fiMeta.h"
 
 class FIWriter : public DD::Image::Writer
 {
@@ -325,9 +327,7 @@ public:
       }
     }
     
-    // Add meta information
-    // nuke.colorspace
-    // nuke.script
+    setMetadata(bitmap);
     
     if (!FreeImage_Save(fif, bitmap, filename(), getFIOptions()))
     {
@@ -349,6 +349,70 @@ public:
   virtual int getFIOptions()
   {
     return 0;
+  }
+  
+  virtual void setMetadata(FIBITMAP *img)
+  {
+    setMetadata(img, META_PREMULT, premult(), META_PREMULT_DESC);
+    setMetadata(img, META_COLORSPACE, getColorSpace(), META_COLORSPACE_DESC);
+    setMetadata(img, META_SCRIPT, getScriptPath(), META_SCRIPT_DESC);
+  }
+  
+protected:
+  
+  void setMetadata(FIBITMAP *img, 
+                   FREE_IMAGE_MDMODEL model, FREE_IMAGE_MDTYPE dtype,
+                   const std::string &key, int count, int length, void *data,
+                   const std::string &desc="")
+  {
+    FITAG *tag = FreeImage_CreateTag();
+    if (tag)
+    {
+      FreeImage_SetTagKey(tag, key.c_str());
+      FreeImage_SetTagDescription(tag, desc.c_str());
+      FreeImage_SetTagType(tag, dtype);
+      FreeImage_SetTagCount(tag, count);
+      FreeImage_SetTagLength(tag, length);
+      FreeImage_SetTagValue(tag, data);
+      FreeImage_SetMetadata(model, img, FreeImage_GetTagKey(tag), tag);
+      FreeImage_DeleteTag(tag);
+    }
+  }
+  
+  void setMetadata(FIBITMAP *img, const std::string &key, bool val, const std::string &desc="")
+  {
+    unsigned char byte = (val ? 1 : 0);
+    setMetadata(img, FIMD_IPTC, FIDT_BYTE, key, 1, 1, (void*)&byte, desc);
+  }
+  
+  void setMetadata(FIBITMAP *img, const std::string &key, const std::string &val, const std::string &desc="")
+  {
+    setMetadata(img, FIMD_IPTC, FIDT_ASCII, key, val.length()+1, val.length()+1, (void*) val.c_str(), desc);
+  }
+  
+  std::string getColorSpace()
+  {
+    // no better way?
+    DD::Image::LUT *csl = lut();
+    
+    const char **n = &(DD::Image::LUT::builtin_names[0]);
+    
+    while (*n != 0)
+    {
+      if (csl == DD::Image::LUT::builtin(*n))
+      {
+        return *n;
+      }
+      ++n;
+    }
+    
+    return "";
+  }
+  
+  std::string getScriptPath()
+  {
+    // couldn't figure out that one yet
+    return "";
   }
   
 protected:

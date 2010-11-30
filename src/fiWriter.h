@@ -7,6 +7,7 @@
 #include <DDImage/Thread.h>
 #include <DDImage/Knobs.h>
 #include <DDImage/LUT.h>
+#include <DDImage/Enumeration_KnobI.h>
 #include <FreeImage.h>
 #include <string>
 #include "fiMeta.h"
@@ -392,18 +393,33 @@ protected:
   
   std::string getColorSpace()
   {
-    // no better way?
-    DD::Image::LUT *csl = lut();
+    DD::Image::Knob *knob = iop->knob("colorspace");
     
-    const char **n = &(DD::Image::LUT::builtin_names[0]);
-    
-    while (*n != 0)
+    if (knob)
     {
-      if (csl == DD::Image::LUT::builtin(*n))
+      DD::Image::Enumeration_KnobI *eknob = knob->enumerationKnob();
+      
+      if (eknob)
       {
-        return *n;
+        const std::vector<std::string> &evals = eknob->menu();
+        
+        int idx = (int) knob->get_value();
+        
+        std::string cs = evals[idx];
+        
+        if (cs.find("default") != std::string::npos)
+        {
+          size_t p0 = cs.find('(');
+          size_t p1 = cs.find(')');
+        
+          if (p0 != std::string::npos && p1 != std::string::npos)
+          {
+            cs = cs.substr(p0+1, p1-p0-1);
+          }
+        }
+        
+        return cs;
       }
-      ++n;
     }
     
     return "";

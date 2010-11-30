@@ -5,6 +5,7 @@
 #include <DDImage/Row.h>
 #include <DDImage/ARRAY.h>
 #include <DDImage/Thread.h>
+#include <DDImage/Enumeration_KnobI.h>
 #include <FreeImage.h>
 #include <string>
 #include "fiMeta.h"
@@ -289,8 +290,8 @@ public:
 protected:
   
   const void* getMetadata(FIBITMAP *img,
-                    FREE_IMAGE_MDMODEL model, FREE_IMAGE_MDTYPE dtype,
-                    const std::string &key)
+                          FREE_IMAGE_MDMODEL model, FREE_IMAGE_MDTYPE dtype,
+                          const std::string &key)
   {
     FITAG *tag = 0;
     if (FreeImage_GetMetadata(model, img, key.c_str(), &tag))
@@ -327,30 +328,26 @@ protected:
   
   void setColorSpace(const std::string &colorspace)
   {
-    // no better way?
-    int csi = 0;
+    DD::Image::Knob *knob = iop->knob("colorspace");
     
-    DD::Image::LUT *csl = DD::Image::LUT::builtin(colorspace.c_str());
-    
-    if (csl != 0)
+    if (knob)
     {
-      const char **n = &(DD::Image::LUT::builtin_names[0]);
-      while (*n != 0)
+      DD::Image::Enumeration_KnobI *eknob = knob->enumerationKnob();
+      
+      if (eknob)
       {
-        if (csl == DD::Image::LUT::builtin(*n))
+        const std::vector<std::string> &evals = eknob->menu();
+        
+        for (size_t i=0; i<evals.size(); ++i)
         {
-          break;
+          if (evals[i] == colorspace)
+          {
+            knob->set_value((double)i);
+            break;
+          }
         }
-        ++csi;
-        ++n;
-      }
-      if (*n == 0)
-      {
-        csi = 0;
       }
     }
-    
-    iop->colorspace(csi);
   }
   
 protected:

@@ -124,7 +124,7 @@ public:
       {
         // no colour channels, only alpha
         
-        for (int y=0; y<h; ++y)
+        for (int y=h-1; y>=0; --y)
         {
           if (aborted())
           {
@@ -132,7 +132,7 @@ public:
             return;
           }
           
-          progressFraction(double(y) / h);
+          progressFraction(double(h-1-y) / h);
           
           get(y, 0, w, channels, row);
           
@@ -150,7 +150,7 @@ public:
         {
           // alpha channel present
           
-          for (int y=0; y<h; ++y)
+          for (int y=h-1; y>=0; --y)
           {
             if (aborted())
             {
@@ -158,7 +158,7 @@ public:
               return;
             }
             
-            progressFraction(double(y) / h);
+            progressFraction(double(h-1-y) / h);
             
             get(y, 0, w, channels, row);
             
@@ -186,7 +186,7 @@ public:
         {
           // no alpha channel
           
-          for (int y=0; y<h; ++y)
+          for (int y=h-1; y>=0; --y)
           {
             if (aborted())
             {
@@ -194,7 +194,7 @@ public:
               return;
             }
             
-            progressFraction(double(y) / h);
+            progressFraction(double(h-1-y) / h);
             
             get(y, 0, w, channels, row);
             
@@ -234,7 +234,7 @@ public:
       {
         // no colour channels, only alpha
         
-        for (int y=0; y<h; ++y)
+        for (int y=h-1; y>=0; --y)
         {
           if (aborted())
           {
@@ -242,7 +242,7 @@ public:
             return;
           }
           
-          progressFraction(double(y) / h);
+          progressFraction(double(h-1-y) / h);
           
           get(y, 0, w, channels, row);
           
@@ -260,7 +260,7 @@ public:
         {
           // alpha channel present
           
-          for (int y=0; y<h; ++y)
+          for (int y=h-1; y>=0; --y)
           {
             if (aborted())
             {
@@ -268,7 +268,7 @@ public:
               return;
             }
             
-            progressFraction(double(y) / h);
+            progressFraction(double(h-1-y) / h);
             
             get(y, 0, w, channels, row);
             
@@ -296,7 +296,7 @@ public:
         {
           // no alpha channel
           
-          for (int y=0; y<h; ++y)
+          for (int y=h-1; y>=0; --y)
           {
             if (aborted())
             {
@@ -304,7 +304,7 @@ public:
               return;
             }
             
-            progressFraction(double(y) / h);
+            progressFraction(double(h-1-y) / h);
             
             get(y, 0, w, channels, row);
             
